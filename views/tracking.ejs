@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🚁</span>
+                <span class="brand-text">DroneExpress Mumbai</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/past-orders" class="nav-link">Past Orders</a>
+                <button class="login-btn">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tracking Container -->
+    <div class="tracking-container">
+        <!-- Order Header -->
+        <div class="tracking-header">
+            <h1>📦 Tracking Order #<%= order.orderId %></h1>
+            <div class="order-meta">
+                <span class="parcel-info">
+                    <strong><%= order.parcelDetails.title %></strong> • 
+                    <%= order.parcelDetails.weight %>kg • 
+                    <%= order.recommendedDrone.name %>
+                </span>
+                <span class="order-total">₹<%= order.pricing.total %></span>
+            </div>
+        </div>
+
+        <!-- Status Card -->
+        <div class="status-card" id="statusCard">
+            <div class="status-icon" id="statusIcon">🚁</div>
+            <h2 id="statusMessage">Preparing your delivery...</h2>
+            <p class="eta" id="etaText">Estimating delivery time...</p>
+            
+            <!-- Progress Bar -->
+            <div class="delivery-progress">
+                <div class="progress-step completed" data-step="confirmed">
+                    <div class="step-icon">✅</div>
+                    <span>Order Confirmed</span>
+                </div>
+                <div class="progress-step" data-step="picked-up" id="stepPickedUp">
+                    <div class="step-icon">📦</div>
+                    <span>Package Ready</span>
+                </div>
+                <div class="progress-step" data-step="in-transit" id="stepInTransit">
+                    <div class="step-icon">🚁</div>
+                    <span>In Transit</span>
+                </div>
+                <div class="progress-step" data-step="delivered" id="stepDelivered">
+                    <div class="step-icon">🎯</div>
+                    <span>Delivered</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Map Section -->
+        <div class="map-section" id="mapSection" style="display: none;">
+            <div class="map-header">
+                <h3>🗺️ Live Drone Tracking</h3>
+                <div class="map-controls">
+                    <button class="map-control-btn active" id="followDrone">Follow Drone</button>
+                    <button class="map-control-btn" id="showFullRoute">Show Route</button>
+                </div>
+            </div>
+            <div class="map-container">
+                <div id="deliveryMap" class="delivery-map"></div>
+                <div class="map-overlay" id="mapOverlay">
+                    <div class="drone-info">
+                        <div class="drone-speed">
+                            <span class="info-label">Speed:</span>
+                            <span class="info-value" id="droneSpeed">0 km/h</span>
+                        </div>
+                        <div class="drone-altitude">
+                            <span class="info-label">Altitude:</span>
+                            <span class="info-value">120m</span>
+                        </div>
+                        <div class="distance-remaining">
+                            <span class="info-label">Distance Remaining:</span>
+                            <span class="info-value" id="distanceRemaining">0 km</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Route Information -->
+        <div class="route-info">
+            <div class="route-card">
+                <h4>📍 Route Details</h4>
+                <div class="route-points">
+                    <div class="route-point pickup">
+                        <div class="point-marker">🟢</div>
+                        <div class="point-details">
+                            <span class="point-label">Pickup Location</span>
+                            <span class="point-address"><%= order.locations.pickup.address %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="route-line">
+                        <div class="distance-badge"><%= order.distance %> km</div>
+                    </div>
+                    
+                    <div class="route-point delivery">
+                        <div class="point-marker">🔴</div>
+                        <div class="point-details">
+                            <span class="point-label">Delivery Location</span>
+                            <span class="point-address"><%= order.locations.delivery.address %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="drone-details-card">
+                <h4>🚁 Drone Information</h4>
+                <div class="drone-specs-grid">
+                    <div class="spec">
+                        <span class="spec-label">Model:</span>
+                        <span class="spec-value"><%= order.recommendedDrone.name %></span>
+                    </div>
+                    <div class="spec">
+                        <span class="spec-label">Max Speed:</span>
+                        <span class="spec-value"><%= order.recommendedDrone.speed %> km/h</span>
+                    </div>
+                    <div class="spec">
+                        <span class="spec-label">Battery:</span>
+                        <span class="spec-value"><%= order.recommendedDrone.batteryLife %></span>
+                    </div>
+                    <div class="spec">
+                        <span class="spec-label">Payload:</span>
+                        <span class="spec-value"><%= order.parcelDetails.weight %>/<%= order.recommendedDrone.maxWeight %> kg</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="emergency-contact">
+            <h4>🆘 Need Help?</h4>
+            <div class="contact-options">
+                <a href="tel:+919876543210" class="contact-btn">
+                    📞 Call Support
+                </a>
+                <button class="contact-btn" onclick="openChat()">
+                    💬 Live Chat
+                </button>
+                <button class="contact-btn" onclick="reportIssue()">
+                    ⚠️ Report Issue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="deliveryModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🎉 Delivery Completed!</h2>
+            </div>
+            <div class="modal-body">
+                <p>Your package has been successfully delivered!</p>
+                <div class="delivery-summary">
+                    <div class="summary-item">
+                        <span>Delivery Time:</span>
+                        <span id="actualDeliveryTime">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Distance Covered:</span>
+                        <span><%= order.distance %> km</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeModal()">View Receipt</button>
+                <button class="modal-btn primary" onclick="goHome()">Place Another Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pass order data to JavaScript -->
+    <script>
+        window.orderData = {
+            orderId: '<%= order.orderId %>',
+            status: '<%= order.status %>',
+            pickupCoords: '<%= JSON.stringify(order.locations.pickup.coordinates) %>',
+            deliveryCoords: '<%= JSON.stringify(order.locations.delivery.coordinates) %>',
+            dronePosition: '<%= JSON.stringify(order.dronePosition) %>',
+            droneSpeed: '<%= order.recommendedDrone.speed %>',
+            estimatedTime: '<%= order.estimatedDeliveryTime %>',
+            pickupOption: '<%= order.pickupOption %>'
+        };
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/tracking.js"></script>
+</body>
+</html>

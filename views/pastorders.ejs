@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🚁</span>
+                <span class="brand-text">DroneExpress Mumbai</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/past-orders" class="nav-link active">Past Orders</a>
+                <button class="login-btn">Login</button>
+                <a href="/order" class="get-started-btn">New Order</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Past Orders Container -->
+    <div class="past-orders-container">
+        <!-- Header Section -->
+        <div class="orders-header">
+            <h1>📋 Your Delivery History</h1>
+            <p>Track all your drone deliveries across Mumbai</p>
+            
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <span class="stat-number"><%= orders.length %></span>
+                        <span class="stat-label">Total Deliveries</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-info">
+                        <span class="stat-number">
+                            <% if (orders.length > 0) { %>
+                                <%= Math.round(orders.reduce((sum, order) => sum + (order.estimatedDeliveryTime || 20), 0) / orders.length) %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </span>
+                        <span class="stat-label">Avg Time (min)</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-number">
+                            ₹<% if (orders.length > 0) { %>
+                                <%= orders.reduce((sum, order) => sum + (order.pricing?.total || 0), 0) %>
+                            <% } else { %>
+                                0
+                            <% } %>
+                        </span>
+                        <span class="stat-label">Total Spent</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🌱</div>
+                    <div class="stat-info">
+                        <span class="stat-number">
+                            <%= orders.reduce((sum, order) => sum + (order.distance || 0), 0).toFixed(1) %>
+                        </span>
+                        <span class="stat-label">CO₂ Saved (kg)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Options -->
+        <div class="filter-section">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Orders</button>
+                <button class="filter-tab" data-filter="delivered">Delivered</button>
+                <button class="filter-tab" data-filter="in-transit">In Transit</button>
+                <button class="filter-tab" data-filter="cancelled">Cancelled</button>
+            </div>
+            
+            <div class="filter-controls">
+                <div class="search-box">
+                    <input type="text" id="orderSearch" placeholder="Search orders..." />
+                    <span class="search-icon">🔍</span>
+                </div>
+                <select id="sortOrders" class="sort-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="amount-high">Amount: High to Low</option>
+                    <option value="amount-low">Amount: Low to High</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list" id="ordersList">
+            <% if (orders && orders.length > 0) { %>
+                <% orders.forEach(order => { %>
+                    <div class="order-card" data-status="<%= order.status %>" data-order-id="<%= order.orderId %>">
+                        <!-- Order Header -->
+                        <div class="order-header">
+                            <div class="order-id-section">
+                                <span class="order-id">#<%= order.orderId %></span>
+                                <span class="order-date">
+                                    <%= new Date(order.createdAt).toLocaleDateString('en-IN', { 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) %>
+                                </span>
+                            </div>
+                            <div class="status-badge status-<%= order.status %>">
+                                <% 
+                                const statusIcons = {
+                                    'delivered': '✅',
+                                    'in-transit': '🚁',
+                                    'picked-up': '📦',
+                                    'confirmed': '⏳',
+                                    'cancelled': '❌'
+                                };
+                                const statusTexts = {
+                                    'delivered': 'Delivered',
+                                    'in-transit': 'In Transit',
+                                    'picked-up': 'Picked Up',
+                                    'confirmed': 'Confirmed',
+                                    'cancelled': 'Cancelled'
+                                };
+                                %>
+                                <span class="status-icon"><%= statusIcons[order.status] || '📦' %></span>
+                                <span class="status-text"><%= statusTexts[order.status] || 'Processing' %></span>
+                            </div>
+                        </div>
+
+                        <!-- Order Content -->
+                        <div class="order-content">
+                            <div class="order-main-info">
+                                <!-- Drone & Package Info -->
+                                <div class="drone-package-info">
+                                    <div class="drone-visual">
+                                        <span class="drone-emoji"><%= order.recommendedDrone?.image || '🚁' %></span>
+                                        <div class="drone-details">
+                                            <span class="drone-name"><%= order.recommendedDrone?.name || 'Drone' %></span>
+                                            <span class="package-type"><%= order.parcelDetails.type %></span>
+                                        </div>
+                                    </div>
+                                    <div class="package-info">
+                                        <h4 class="package-title"><%= order.parcelDetails.title %></h4>
+                                        <span class="package-weight">⚖️ <%= order.parcelDetails.weight %>kg</span>
+                                    </div>
+                                </div>
+
+                                <!-- Route Information -->
+                                <div class="route-summary">
+                                    <div class="route-point">
+                                        <span class="route-icon pickup">🟢</span>
+                                        <div class="route-details">
+                                            <span class="route-label">From:</span>
+                                            <span class="route-address"><%= order.locations.pickup.address %></span>
+                                        </div>
+                                    </div>
+                                    <div class="route-arrow">
+                                        <span class="arrow">→</span>
+                                        <span class="distance"><%= order.distance %>km</span>
+                                    </div>
+                                    <div class="route-point">
+                                        <span class="route-icon delivery">🔴</span>
+                                        <div class="route-details">
+                                            <span class="route-label">To:</span>
+                                            <span class="route-address"><%= order.locations.delivery.address %></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Stats -->
+                            <div class="order-stats">
+                                <div class="stat-item">
+                                    <span class="stat-icon">⏱️</span>
+                                    <div class="stat-info">
+                                        <span class="stat-label">Delivery Time</span>
+                                        <span class="stat-value">
+                                            <% if (order.actualDeliveryTime && order.createdAt) { %>
+                                                <%= Math.round((new Date(order.actualDeliveryTime) - new Date(order.createdAt)) / (1000 * 60)) %> min
+                                            <% } else { %>
+                                                <%= order.estimatedDeliveryTime || 20 %> min
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">🏠</span>
+                                    <div class="stat-info">
+                                        <span class="stat-label">Pickup</span>
+                                        <span class="stat-value">
+                                            <%= order.pickupOption === 'home' ? 'Home' : 'Station' %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">💰</span>
+                                    <div class="stat-info">
+                                        <span class="stat-label">Total Cost</span>
+                                        <span class="stat-value">₹<%= order.pricing?.total || 0 %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Actions -->
+                        <div class="order-actions">
+                            <% if (order.status === 'delivered') { %>
+                                <button class="action-btn secondary" onclick="downloadReceipt('<%= order.orderId %>')">
+                                    📄 Receipt
+                                </button>
+                                <button class="action-btn secondary" onclick="reorderPackage('<%= order.orderId %>')">
+                                    🔄 Reorder
+                                </button>
+                                <button class="action-btn primary" onclick="rateDelivery('<%= order.orderId %>')">
+                                    ⭐ Rate Delivery
+                                </button>
+                            <% } else if (order.status === 'in-transit') { %>
+                                <a href="/tracking/<%= order.orderId %>" class="action-btn primary">
+                                    📍 Track Live
+                                </a>
+                                <button class="action-btn secondary" onclick="shareTracking('<%= order.orderId %>')">
+                                    📤 Share Tracking
+                                </button>
+                            <% } else { %>
+                                <button class="action-btn secondary" onclick="viewOrderDetails('<%= order.orderId %>')">
+                                    👁️ View Details
+                                </button>
+                                <% if (order.status === 'confirmed') { %>
+                                    <button class="action-btn danger" onclick="cancelOrder('<%= order.orderId %>')">
+                                        ❌ Cancel
+                                    </button>
+                                <% } %>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't placed any drone delivery orders yet. Start by placing your first order!</p>
+                    <a href="/order" class="empty-cta-btn">
+                        🚀 Place Your First Order
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Load More Button -->
+        <% if (orders && orders.length >= 10) { %>
+            <div class="load-more-section">
+                <button class="load-more-btn" id="loadMoreBtn">
+                    Load More Orders
+                </button>
+            </div>
+        <% } %>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions-grid">
+                <div class="quick-action-card" onclick="window.location.href='/order'">
+                    <span class="quick-action-icon">🚀</span>
+                    <h4>New Delivery</h4>
+                    <p>Schedule another drone delivery</p>
+                </div>
+                <div class="quick-action-card" onclick="openSupport()">
+                    <span class="quick-action-icon">🆘</span>
+                    <h4>Support</h4>
+                    <p>Get help with your orders</p>
+                </div>
+                <div class="quick-action-card" onclick="downloadHistory()">
+                    <span class="quick-action-icon">📊</span>
+                    <h4>Export History</h4>
+                    <p>Download order history CSV</p>
+                </div>
+                <div class="quick-action-card" onclick="shareApp()">
+                    <span class="quick-action-icon">📤</span>
+                    <h4>Share App</h4>
+                    <p>Tell friends about drone delivery</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Modal -->
+    <div class="modal" id="ratingModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⭐ Rate Your Delivery Experience</h3>
+            </div>
+            <div class="modal-body">
+                <div class="rating-section">
+                    <p>How was your drone delivery experience?</p>
+                    <div class="star-rating" id="starRating">
+                        <span class="star" data-rating="1">⭐</span>
+                        <span class="star" data-rating="2">⭐</span>
+                        <span class="star" data-rating="3">⭐</span>
+                        <span class="star" data-rating="4">⭐</span>
+                        <span class="star" data-rating="5">⭐</span>
+                    </div>
+                    <textarea id="ratingComment" placeholder="Tell us more about your experience..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeRatingModal()">Skip</button>
+                <button class="modal-btn primary" onclick="submitRating()">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/pastorders.js"></script>
+</body>
+</html>

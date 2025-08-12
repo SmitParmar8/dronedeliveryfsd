@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🚁</span>
+                <span class="brand-text">DroneExpress Mumbai</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link active">Home</a>
+                <a href="/past-orders" class="nav-link">Past Orders</a>
+                <button class="login-btn">Login</button>
+                <a href="/order" class="get-started-btn">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Future of Delivery is Here
+                    <span class="location">🌆 Mumbai</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Ultra-fast drone delivery service across Mumbai. Get your packages delivered in minutes, not hours.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">15</span>
+                        <span class="stat-label">Minutes Avg</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">30km</span>
+                        <span class="stat-label">Max Range</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Service</span>
+                    </div>
+                </div>
+                <a href="/order" class="cta-button">
+                    Order Now 🚀
+                </a>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="floating-drones">
+                    <div class="drone drone-1">🚁</div>
+                    <div class="drone drone-2">🚁</div>
+                    <div class="drone drone-3">🚁</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Drone Fleet Carousel -->
+    <section class="drone-fleet-section">
+        <div class="fleet-container">
+            <div class="section-header">
+                <h2>Our Advanced Drone Fleet</h2>
+                <p>Choose from our state-of-the-art drones designed for Mumbai's unique delivery needs</p>
+            </div>
+            
+            <div class="carousel-wrapper">
+                <div class="drone-carousel" id="droneCarousel">
+                    <% if (drones && drones.length > 0) { %>
+                        <% drones.forEach((drone, index) => { %>
+                            <div class="carousel-slide <%= index === 0 ? 'active' : '' %>" data-index="<%= index %>">
+                                <div class="drone-showcase">
+                                    <div class="drone-visual">
+                                        <div class="drone-icon"><%= drone.image %></div>
+                                        <div class="drone-animation">
+                                            <div class="flight-path"></div>
+                                            <div class="mini-drone">✈️</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="drone-info">
+                                        <div class="drone-header">
+                                            <h3 class="drone-name"><%= drone.name %></h3>
+                                            <span class="drone-model"><%= drone.model %></span>
+                                        </div>
+                                        
+                                        <div class="drone-specs">
+                                            <div class="spec-grid">
+                                                <div class="spec-item">
+                                                    <div class="spec-icon">⚖️</div>
+                                                    <div class="spec-details">
+                                                        <span class="spec-label">Max Weight</span>
+                                                        <span class="spec-value"><%= drone.maxWeight %> kg</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="spec-item">
+                                                    <div class="spec-icon">📏</div>
+                                                    <div class="spec-details">
+                                                        <span class="spec-label">Range</span>
+                                                        <span class="spec-value"><%= drone.maxRange %> km</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="spec-item">
+                                                    <div class="spec-icon">🔋</div>
+                                                    <div class="spec-details">
+                                                        <span class="spec-label">Battery</span>
+                                                        <span class="spec-value"><%= drone.batteryLife %></span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="spec-item">
+                                                    <div class="spec-icon">💰</div>
+                                                    <div class="spec-details">
+                                                        <span class="spec-label">Rate</span>
+                                                        <span class="spec-value">₹<%= drone.pricePerKm %>/km</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="drone-description"><%= drone.description %></p>
+                                        
+                                        <div class="suitable-for">
+                                            <span class="suitable-label">Perfect for:</span>
+                                            <div class="tags">
+                                                <% drone.suitableFor.forEach(type => { %>
+                                                    <span class="tag"><%= type %></span>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="carousel-slide active">
+                            <div class="drone-showcase">
+                                <div class="drone-visual">
+                                    <div class="drone-icon">🚁</div>
+                                </div>
+                                <div class="drone-info">
+                                    <h3>Loading Drones...</h3>
+                                    <p>Please wait while we load our fleet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Carousel Controls -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" id="prevBtn">‹</button>
+                    <div class="carousel-indicators" id="carouselIndicators">
+                        <% if (drones && drones.length > 0) { %>
+                            <% drones.forEach((drone, index) => { %>
+                                <button class="indicator <%= index === 0 ? 'active' : '' %>" data-index="<%= index %>"></button>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    <button class="carousel-btn next-btn" id="nextBtn">›</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Deliver packages within 15-30 minutes across Mumbai metropolitan area</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Watch your package fly through Mumbai with live GPS tracking on interactive maps</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌱</div>
+                    <h3>Eco-friendly</h3>
+                    <p>Zero emissions delivery contributing to a cleaner, greener Mumbai</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Safe & Secure</h3>
+                    <p>Advanced safety protocols and secure packaging for your valuable items</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <span class="brand-icon">🚁</span>
+                <span class="brand-text">DroneExpress Mumbai</span>
+            </div>
+            <p class="footer-text">© 2025 DroneExpress. Revolutionizing delivery in Mumbai.</p>
+        </div>
+    </footer>
+
+    <script src="/js/carousel.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

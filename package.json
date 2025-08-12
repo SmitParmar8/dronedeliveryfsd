@@ -1,0 +1,32 @@
+{
+  "name": "drone-delivery-service",
+  "version": "1.0.0",
+  "description": "Mumbai Drone Parcel Delivery Service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "drone",
+    "delivery",
+    "mumbai",
+    "express",
+    "mongodb"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "ejs": "^3.1.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "body-parser": "^1.20.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+

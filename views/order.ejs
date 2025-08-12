@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">🚁</span>
+                <span class="brand-text">DroneExpress Mumbai</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/past-orders" class="nav-link">Past Orders</a>
+                <button class="login-btn">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Order Flow Container -->
+    <div class="order-container">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <div class="step-number">1</div>
+                <span class="step-label">Locations</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <span class="step-label">Parcel Details</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <span class="step-label">Drone Selection</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <span class="step-label">Pickup & Schedule</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <span class="step-label">Payment</span>
+            </div>
+        </div>
+
+        <!-- Step Content Container -->
+        <div class="step-content-container">
+            <!-- Step 1: Locations -->
+            <div class="step-content active" id="step1">
+                <div class="step-header">
+                    <h2>📍 Pickup & Delivery Locations</h2>
+                    <p>Enter your pickup and delivery addresses within Mumbai</p>
+                </div>
+                
+                <form class="location-form">
+                    <div class="input-group">
+                        <label for="pickupLocation">Pickup Location</label>
+                        <input type="text" id="pickupLocation" placeholder="Enter pickup address in Mumbai" required>
+                        <div class="location-suggestions" id="pickupSuggestions"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="deliveryLocation">Delivery Location</label>
+                        <input type="text" id="deliveryLocation" placeholder="Enter delivery address in Mumbai" required>
+                        <div class="location-suggestions" id="deliverySuggestions"></div>
+                    </div>
+                    
+                    <div class="distance-estimate" id="distanceEstimate" style="display: none;">
+                        <div class="estimate-info">
+                            <span class="distance-text">Estimated Distance: <strong id="estimatedDistance">0 km</strong></span>
+                            <span class="time-text">Delivery Time: <strong id="estimatedTime">0 min</strong></span>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="next-btn" onclick="nextStep(2)">
+                        Continue to Parcel Details →
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Parcel Details -->
+            <div class="step-content" id="step2">
+                <div class="step-header">
+                    <h2>📦 Parcel Details</h2>
+                    <p>Tell us about your package so we can recommend the best drone</p>
+                </div>
+                
+                <form class="parcel-form">
+                    <div class="input-group">
+                        <label for="parcelTitle">Parcel Title</label>
+                        <input type="text" id="parcelTitle" placeholder="e.g., Important Documents, Electronics" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="parcelType">Package Category</label>
+                        <select id="parcelType" required>
+                            <option value="">Select package type</option>
+                            <option value="documents">📄 Documents</option>
+                            <option value="electronics">💻 Electronics</option>
+                            <option value="food">🍕 Food Items</option>
+                            <option value="medicines">💊 Medicines</option>
+                            <option value="fragile">📦 Fragile Items</option>
+                            <option value="heavy">⚖️ Heavy Items</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="parcelWeight">Weight (kg)</label>
+                        <input type="number" id="parcelWeight" min="0.1" max="10" step="0.1" placeholder="0.5" required>
+                        <small class="input-help">Maximum weight: 10 kg</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="parcelDescription">Additional Details (Optional)</label>
+                        <textarea id="parcelDescription" placeholder="Any special handling instructions or additional information"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="back-btn" onclick="previousStep(1)">
+                            ← Back
+                        </button>
+                        <button type="button" class="next-btn" onclick="recommendDrone()">
+                            Find Suitable Drone →
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 3: Drone Recommendation -->
+            <div class="step-content" id="step3">
+                <div class="step-header">
+                    <h2>🚁 Recommended Drone</h2>
+                    <p>Based on your requirements, here's the perfect drone for your delivery</p>
+                </div>
+                
+                <div class="drone-recommendation" id="droneRecommendation">
+                    <!-- Drone recommendation will be populated by JavaScript -->
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="back-btn" onclick="previousStep(2)">
+                        ← Back
+                    </button>
+                    <button type="button" class="next-btn" onclick="nextStep(4)">
+                        Confirm Drone →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Pickup & Schedule -->
+            <div class="step-content" id="step4">
+                <div class="step-header">
+                    <h2>🏠 Pickup Options & Schedule</h2>
+                    <p>Choose how you'd like to send your package</p>
+                </div>
+                
+                <div class="pickup-options">
+                    <div class="option-cards">
+                        <label class="option-card" for="homePickup">
+                            <input type="radio" id="homePickup" name="pickupOption" value="home">
+                            <div class="option-content">
+                                <div class="option-icon">🏠</div>
+                                <h3>Home Pickup</h3>
+                                <p>We'll collect from your doorstep</p>
+                                <span class="price">+ ₹100</span>
+                            </div>
+                        </label>
+                        
+                        <label class="option-card" for="stationDrop">
+                            <input type="radio" id="stationDrop" name="pickupOption" value="station">
+                            <div class="option-content">
+                                <div class="option-icon">🏢</div>
+                                <h3>Drop at Station</h3>
+                                <p>Drop your package at our nearest station</p>
+                                <span class="price">Free</span>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="schedule-section">
+                        <div class="input-group">
+                            <label for="scheduledTime">Select Date & Time</label>
+                            <input type="datetime-local" id="scheduledTime" required>
+                            <small class="input-help">Choose when you want the pickup/drop-off</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="back-btn" onclick="previousStep(3)">
+                        ← Back
+                    </button>
+                    <button type="button" class="next-btn" onclick="nextStep(5)">
+                        Continue to Payment →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Payment -->
+            <div class="step-content" id="step5">
+                <div class="step-header">
+                    <h2>💳 Payment Summary</h2>
+                    <p>Review your order and complete payment</p>
+                </div>
+                
+                <div class="payment-summary">
+                    <div class="order-summary" id="orderSummary">
+                        <!-- Order summary will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="pricing-breakdown" id="pricingBreakdown">
+                        <!-- Pricing breakdown will be populated by JavaScript -->
+                    </div>
+                    
+                    <div class="payment-methods">
+                        <h3>Payment Method</h3>
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="card" checked>
+                                <span class="payment-icon">💳</span>
+                                <span>Credit/Debit Card</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="upi">
+                                <span class="payment-icon">📱</span>
+                                <span>UPI Payment</span>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="wallet">
+                                <span class="payment-icon">👛</span>
+                                <span>Digital Wallet</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="back-btn" onclick="previousStep(4)">
+                        ← Back
+                    </button>
+                    <button type="button" class="pay-btn" onclick="processPayment()">
+                        <span class="pay-text">Pay & Start Delivery</span>
+                        <span class="pay-amount" id="totalAmount">₹0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/orderFlow.js"></script>
+</body>
+</html>
